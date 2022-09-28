@@ -30,7 +30,7 @@ from random import randint
 
 # ? Create dataframes
 
-def create_dataframe(Folder_path: str, CSV_name: str, Column_names: str) -> None: 
+def create_dataframe(Column_names, Folder_save: str, CSV_name: str) -> None: 
 
     # * Lists
     #Column_names = ['Folder', 'New Folder', 'Animal', 'Label']
@@ -40,7 +40,7 @@ def create_dataframe(Folder_path: str, CSV_name: str, Column_names: str) -> None
 
     # *
     Dataframe_name = "Dataframe_{}.csv".format(CSV_name)
-    Dataframe_folder = os.path.join(Folder_path, Dataframe_name)
+    Dataframe_folder = os.path.join(Folder_save, Dataframe_name)
 
     # *
     Dataframe_created.to_csv(Dataframe_folder)
@@ -791,7 +791,7 @@ def concat_dataframe(*dfs: pd.DataFrame, **kwargs: str) -> pd.DataFrame:
 
 # ? Concat multiple dataframes
 
-def concat_dataframe(*dfs: pd.DataFrame, **kwargs: str) -> pd.DataFrame:
+def concat_dataframe_list(Dataframes, **kwargs: str) -> pd.DataFrame:
   """
   Concat multiple dataframes and name it using technique and the class problem
 
@@ -838,9 +838,8 @@ def concat_dataframe(*dfs: pd.DataFrame, **kwargs: str) -> pd.DataFrame:
     raise TypeError("Class problem must be a string") #! Alert
 
   # * Concatenate each dataframe
-  ALL_dataframes = [df for df in dfs]
-  print(len(ALL_dataframes))
-  Final_dataframe = pd.concat(ALL_dataframes, ignore_index = True, sort = False)
+  print(len(Dataframes))
+  Final_dataframe = pd.concat(Dataframes, ignore_index = True, sort = False)
       
   #pd.set_option('display.max_rows', Final_dataframe.shape[0] + 1)
   #print(DataFrame)
@@ -854,7 +853,7 @@ def concat_dataframe(*dfs: pd.DataFrame, **kwargs: str) -> pd.DataFrame:
     Final_dataframe.to_csv(Dataframe_folder_save)
 
   return Final_dataframe
-  
+
 # ? Split folders into train/test/validation
 
 def split_folders_train_test_val(Folder_path:str, Only_train_test: bool) -> str:

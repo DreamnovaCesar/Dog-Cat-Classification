@@ -1,18 +1,19 @@
 
 ########## ########## ########## ########## ########## ########## ########## ########## ########## ##########
 
-from configparser import Interpolation
+from ntpath import join
+import cv2
 import pandas as pd
 
-from Dog_Cat_Classification_1_General_Functions import concat_dataframe
+from Dog_Cat_Classification_1_General_Functions import concat_dataframe_list
 from Dog_Cat_Classification_4_Image_Processing import ImageProcessing
 
 ########## ########## ########## ########## ########## ########## ########## ########## ########## ##########
 
-def preprocessing_technique_Biclass(CSV_path: str) -> pd.DataFrame:
+def image_preprocessing(CSV_path: str) -> None:
 
     with open(CSV_path) as CSV:
-
+        
         Data = pd.read_csv(CSV)
 
         # *
@@ -21,24 +22,42 @@ def preprocessing_technique_Biclass(CSV_path: str) -> pd.DataFrame:
         Animal = Data['Animal'].tolist()
         Label = Data['Label'].tolist()
 
+        #Label = list(map(int, Label))
+
         # *
         Interpolation = Data['Interpolation'].tolist()
         X_size = Data['X'].tolist()
         Y_size = Data['Y'].tolist()
 
+        for i, Interpo in enumerate(Interpolation):
+            if(Interpo == 'INTER_CUBIC'):
+                Interpolation[i] = cv2.INTER_CUBIC
+
+        #X_size = list(map(int, X_size))
+        #Y_size = list(map(int, Y_size))
+
         # *
         Division = Data['Division'].tolist()
+
+        #Division = list(map(int, Division))
 
         # *
         Clip_limit = Data['Clip Limit'].tolist()
         Title_grid_size_X = Data['TitleGridSize X'].tolist()
         Title_grid_size_Y = Data['TitleGridSize Y'].tolist()
         
-        Title_grid_size = (Title_grid_size_X, Title_grid_size_Y)
+        Clip_limit = list(map(float, Clip_limit))
+        Title_grid_size_X = list(map(int, Title_grid_size_X))
+        Title_grid_size_Y = list(map(int, Title_grid_size_Y))
+
+        Title_grid_size = (Title_grid_size_X[0], Title_grid_size_Y[0])
 
         # *
         Radius = Data['Radius'].tolist()
         Amount = Data['Amount'].tolist()
+
+        Radius = [int(item) for item in Radius]
+        Amount = [int(item) for item in Amount]
 
         # *
         Technique = Data['Technique'].tolist()
@@ -49,125 +68,67 @@ def preprocessing_technique_Biclass(CSV_path: str) -> pd.DataFrame:
         # *
         Rows = len(Folder)
         
-    # * 
-    Object_IP = []
+        # * 
+        Object_IP = []
 
-    # * 
-    Dataframes = [None] * len(Folder)
+        # * 
+        Dataframes = [None] * len(Folder)
 
-    # * Class problem definition
-    Class_problem = len(Folder)
+        # * Class problem definition
+        Class_problem = len(Folder)
 
-    if Class_problem == 2:
-        Class_problem_prefix = 'Biclass'
-    elif Class_problem > 2:
-        Class_problem_prefix = 'Multiclass'
+        if Class_problem == 2:
+            Class_problem_prefix = 'Biclass'
+        elif Class_problem > 2:
+            Class_problem_prefix = 'Multiclass'
 
-    # * Image processing class
-
-    for i in range(Rows):
-        Object_IP(ImageProcessing(Folder = Folder[i], Newfolder = New_folder[i], animal = Animal[i], label = Label, I = Interpolation, X = X_size, Y = Y_size,
-                                    cliplimit = Clip_limit, tileGridSize = Title_grid_size, division = Division, radius = Radius, amount = Amount))
+        # * Image processing class
 
 
-    # * Choose the technique utilized for the test
-    if Technique == 'NO':
+        for i in range(Rows):
+            Object_IP.append(ImageProcessing(folder = Folder[i], newfolder = New_folder[i], animal = Animal[i], label = Label[i], I = Interpolation[i], X = X_size[i], Y = Y_size[i],
+                                    cliplimit = Clip_limit[i], tileGridSize = Title_grid_size, division = Division[i], radius = Radius[i], amount = Amount[i]))
 
         for i in range(len(Object_IP)):
-            Dataframes[i] = Object_IP[i].normalize_technique()
 
-    elif Technique == 'CLAHE':
+            # * Choose the technique utilized for the test
 
-        for i in range(len(Object_IP)):
-            Dataframes[i] = Object_IP[i].normalize_technique()
+            if Technique[i] == 'RE':
 
-    elif Technique == 'HE':
+                Dataframes[i] = Object_IP[i].resize_technique()
+                
+            elif Technique[i] == 'NO':
 
-        for i in range(len(Object_IP)):
-            Dataframes[i] = Object_IP[i].normalize_technique()
+                Dataframes[i] = Object_IP[i].normalize_technique()
 
-    elif Technique == 'UM':
+            elif Technique[i] == 'CLAHE':
 
-        for i in range(len(Object_IP)):
-            Dataframes[i] = Object_IP[i].normalize_technique()
+                Dataframes[i] = Object_IP[i].CLAHE_technique()
 
-    elif Technique == 'CS':
+            elif Technique[i] == 'HE':
 
-        for i in range(len(Object_IP)):
-            Dataframes[i] = Object_IP[i].normalize_technique()
-    
-    elif Technique == 'MF':
-        
-        for i in range(len(Object_IP)):
-            Dataframes[i] = Object_IP[i].normalize_technique()
+                Dataframes[i] = Object_IP[i].histogram_equalization_technique()
 
-    else:
-        raise ValueError("Choose a new technique")      #! Alert
+            elif Technique[i] == 'UM':
 
-    # * Concatenate dataframes with this function
-    concat_dataframe(DataFrame_Normal, DataFrame_Tumor, folder = CSV_path_folder, classp = Class_problem_prefix, technique = Technique, savefile = True)
+                Dataframes[i] = Object_IP[i].unsharp_masking_technique()
 
-def preprocessing_technique_Multiclass(New_technique, Folder_normal, Folder_benign, Folder_malignant, New_folder_normal, New_folder_benign, New_folder_malignant):
+            elif Technique[i] == 'CS':
 
-    # * Parameters for normalization
+                Dataframes[i] = Object_IP[i].contrast_stretching_technique()
+            
+            elif Technique[i] == 'MF':
 
-    # * Labels
-    Label_Normal = 'Normal'   # Normal label 
-    Label_Benign = 'Benign'   # Benign label
-    Label_Malignant = 'Malignant' # Malignant label
+                Dataframes[i] = Object_IP[i].median_filter_technique()
+            
+            elif Technique[i] == 'CLAHERGB':
 
-    Cliplimit = 0.01
-    Division = 3
-    Radius = 2
-    Amount = 1
+                Dataframes[i] = Object_IP[i].CLAHE_RGB_technique()
 
-    # * Classes
-    Normal_images_class = 0 # Normal class
-    Benign_images_class = 1 # Tumor class
-    Malignant_images_class = 2 # Tumor class
+            else:
+                raise ValueError("Choose a new technique")      #! Alert
 
-    # * Problem class
-    Multiclass = 'Multiclass' # Multiclass label
+        if(Technique[i] != 'RE'):
+            # * Concatenate dataframes with this function
+            concat_dataframe_list(Dataframes, folder = CSV_path_folder[i], classp = Class_problem_prefix, technique = Technique[i], savefile = True)
 
-    Normalization_Normal = ImageProcessing(Folder = Folder_normal, Newfolder = New_folder_normal, Severity = Label_Normal, Label = Normal_images_class,
-                                            cliplimit = Cliplimit, division = Division, radius = Radius, amount = Amount)
-    Normalization_Benign = ImageProcessing(Folder = Folder_benign, Newfolder = New_folder_benign, Severity = Label_Benign, Label = Benign_images_class,
-                                            cliplimit = Cliplimit, division = Division, radius = Radius, amount = Amount)
-    Normalization_Malignant = ImageProcessing(Folder = Folder_malignant, Newfolder = New_folder_malignant, Severity = Label_Malignant, Label = Malignant_images_class,
-                                            cliplimit = Cliplimit, division = Division, radius = Radius, amount = Amount)
-
-    if New_technique == 'NO':
-        DataFrame_Normal = Normalization_Normal.normalize_technique()
-        DataFrame_Benign = Normalization_Benign.normalize_technique()
-        DataFrame_Malignant = Normalization_Malignant.normalize_technique()
-
-    elif New_technique == 'CLAHE':
-        DataFrame_Normal = Normalization_Normal.CLAHE_technique()
-        DataFrame_Benign = Normalization_Benign.CLAHE_technique()
-        DataFrame_Malignant = Normalization_Malignant.CLAHE_technique()
-
-    elif New_technique == 'HE':
-        DataFrame_Normal = Normalization_Normal.histogram_equalization_technique()
-        DataFrame_Benign = Normalization_Benign.histogram_equalization_technique()
-        DataFrame_Malignant = Normalization_Malignant.histogram_equalization_technique()
-
-    elif New_technique == 'UM':
-        DataFrame_Normal = Normalization_Normal.unsharp_masking_technique()
-        DataFrame_Benign = Normalization_Benign.unsharp_masking_technique()
-        DataFrame_Malignant = Normalization_Malignant.unsharp_masking_technique()
-
-    elif New_technique == 'CS':
-        DataFrame_Normal = Normalization_Normal.contrast_stretching_technique()
-        DataFrame_Benign = Normalization_Benign.contrast_stretching_technique()
-        DataFrame_Malignant = Normalization_Malignant.contrast_stretching_technique()
-
-    elif New_technique == 'MF':
-        DataFrame_Normal = Normalization_Normal.median_filter_technique()
-        DataFrame_Benign = Normalization_Benign.median_filter_technique()
-        DataFrame_Malignant = Normalization_Malignant.median_filter_technique()
-
-    else:
-        raise ValueError("Choose a new technique")    #! Alert
-
-    # * Concatenate dataframes with this function
-    concat_dataframe(DataFrame_Normal, DataFrame_Benign, DataFrame_Malignant, Folder = Multiclass_Data_CSV, Class = Multiclass, Technique = New_technique)

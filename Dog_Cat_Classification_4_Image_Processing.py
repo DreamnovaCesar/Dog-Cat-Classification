@@ -75,17 +75,17 @@ class ImageProcessing:
         if not isinstance(self.New_folder, str):
             raise TypeError("Folder destination attribute must be a string") #! Alert
 
-        # * Severity (ValueError, TypeError)
-        if self.Severity == None:
+        # * Animal (ValueError, TypeError)
+        if self.Animal == None:
             raise ValueError("Severity attribute does not exist") #! Alert
-        if not isinstance(self.Severity, str):
+        if not isinstance(self.Animal, str):
             raise TypeError("Severity attribute must be a string") #! Alert
 
         # * Label (ValueError, TypeError)
         if self.Label == None:
             raise ValueError("Label attribute does not exist") #! Alert
         if not isinstance(self.Label, int):
-            raise TypeError("Label attribute must be a string") #! Alert
+            raise TypeError("Label attribute must be a integer") #! Alert
 
         # ? Resize
         # * X resize (TypeError)
@@ -108,9 +108,9 @@ class ImageProcessing:
         # ? Unsharp masking
         # * Radius and amount (TypeError)
         if not isinstance(self.Radius, int):
-            raise TypeError("Clip limit must be integer") #! Alert
+            raise TypeError("Radius must be integer") #! Alert
         if not isinstance(self.Amount, int):
-            raise TypeError("Clip limit must be integer") #! Alert
+            raise TypeError("Amount must be integer") #! Alert
 
     def __repr__(self):
 
@@ -161,7 +161,7 @@ class ImageProcessing:
     # * Animal attribute
     @property
     def Animal_property(self):
-        return self.Severity
+        return self.Animal
 
     @Animal_property.setter
     def Animal_property(self, New_value):
@@ -333,7 +333,7 @@ class ImageProcessing:
 
         # * Using sort function
         Sorted_files, Total_images = sort_images(self.Folder)
-        Count:int = 1
+        Count:int = 0
 
         # * Reading the files
         for File in Sorted_files:
@@ -360,7 +360,7 @@ class ImageProcessing:
 
                     # * Name the new file
                     New_name_filename = Filename + Format
-                    New_folder = os.path.join(self.Folder, New_name_filename)
+                    New_folder = os.path.join(self.New_folder, New_name_filename)
 
                     # * Save the image in a new folder
                     cv2.imwrite(New_folder, Resized_imagen)
@@ -414,7 +414,7 @@ class ImageProcessing:
 
         # * Using sort function
         Sorted_files, Total_images = sort_images(self.Folder)
-        Count:int = 1
+        Count:int = 0
 
         # * Reading the files
         for File in Sorted_files:
@@ -530,7 +530,7 @@ class ImageProcessing:
 
         # * Using sort function
         Sorted_files, Total_images = sort_images(self.Folder)
-        Count:int = 1
+        Count:int = 0
 
         # * Reading the files
         for File in Sorted_files:
@@ -636,7 +636,7 @@ class ImageProcessing:
 
         # * Using sort function
         Sorted_files, Total_images = sort_images(self.Folder)
-        Count = 1
+        Count = 0
 
         # * Reading the files
         for File in Sorted_files:
@@ -747,7 +747,7 @@ class ImageProcessing:
 
         # * Using sort function
         Sorted_files, Total_images = sort_images(self.Folder)
-        Count = 1
+        Count = 0
 
         # * Reading the files
         for File in Sorted_files:
@@ -855,7 +855,7 @@ class ImageProcessing:
 
         # * Using sort function
         Sorted_files, Total_images = sort_images(self.Folder)
-        Count = 1
+        Count = 0
 
         # * Reading the files
         for File in Sorted_files:
@@ -961,7 +961,7 @@ class ImageProcessing:
 
         # * Using sort function
         Sorted_files, Total_images = sort_images(self.Folder)
-        Count = 1
+        Count = 0
 
         # * Reading the files
         for File in Sorted_files:
@@ -1068,7 +1068,7 @@ class ImageProcessing:
 
         # * Using sort function
         Sorted_files, Total_images = sort_images(self.Folder)
-        Count = 1
+        Count = 0
 
         # * Reading the files
         for File in Sorted_files:
@@ -1085,7 +1085,7 @@ class ImageProcessing:
 
                     # * Resize with the given values
                     Path_file = os.path.join(self.Folder, File)
-                    Image = cv2.imread(Path_file, as_gray = True)
+                    Image = cv2.imread(Path_file)
 
                     HSV_image = cv2.cvtColor(Image, cv2.COLOR_BGR2HSV)
 
@@ -1108,22 +1108,22 @@ class ImageProcessing:
                     RGB_CLAHE_image = cv2.cvtColor(Image, cv2.COLOR_HSV2RGB)
 
                     # * Save each statistic in a variable
-                    Mae = mae(Image, RGB_CLAHE_image)
-                    Mse = mse(Image, RGB_CLAHE_image)
-                    Ssim = ssim(Image, RGB_CLAHE_image)
-                    Psnr = psnr(Image, RGB_CLAHE_image)
-                    Nrmse = nrmse(Image, RGB_CLAHE_image)
-                    Nmi = nmi(Image, RGB_CLAHE_image)
-                    R2s = r2s(Image, RGB_CLAHE_image)
+                    #Mae = mae(Image, RGB_CLAHE_image)
+                    #Mse = mse(Image, RGB_CLAHE_image)
+                    #Ssim = ssim(Image, RGB_CLAHE_image)
+                    #Psnr = psnr(Image, RGB_CLAHE_image)
+                    #Nrmse = nrmse(Image, RGB_CLAHE_image)
+                    #Nmi = nmi(Image, RGB_CLAHE_image)
+                    #R2s = r2s(Image, RGB_CLAHE_image)
 
                     # * Add the value in the lists already created
-                    Mae_ALL.append(Mae)
-                    Mse_ALL.append(Mse)
-                    Ssim_ALL.append(Ssim)
-                    Psnr_ALL.append(Psnr)
-                    Nrmse_ALL.append(Nrmse)
-                    Nmi_ALL.append(Nmi)
-                    R2s_ALL.append(R2s)
+                    #Mae_ALL.append(Mae)
+                    #Mse_ALL.append(Mse)
+                    #Ssim_ALL.append(Ssim)
+                    #Psnr_ALL.append(Psnr)
+                    #Nrmse_ALL.append(Nrmse)
+                    #Nmi_ALL.append(Nmi)
+                    #R2s_ALL.append(R2s)
 
                     # * Name the new file
                     Filename_and_technique = '{}_CLAHE_RGB'.format(str(Filename))
@@ -1148,6 +1148,6 @@ class ImageProcessing:
         print('{} of {} tranformed ✅'.format(str(Count), str(Total_images))) #! Alert
 
         # * Return the new dataframe with the new data
-        DataFrame = pd.DataFrame({'REFNUMMF_ALL':All_filenames, 'MAE':Mae_ALL, 'MSE':Mse_ALL, 'SSIM':Ssim_ALL, 'PSNR':Psnr_ALL, 'NRMSE':Nrmse_ALL, 'NMI':Nmi_ALL, 'R2s':R2s_ALL, 'Labels':Labels})
+        #DataFrame = pd.DataFrame({'REFNUMMF_ALL':All_filenames, 'MAE':Mae_ALL, 'MSE':Mse_ALL, 'SSIM':Ssim_ALL, 'PSNR':Psnr_ALL, 'NRMSE':Nrmse_ALL, 'NMI':Nmi_ALL, 'R2s':R2s_ALL, 'Labels':Labels})
 
-        return DataFrame
+        #return DataFrame
