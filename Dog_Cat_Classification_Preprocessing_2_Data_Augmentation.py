@@ -291,7 +291,7 @@ def preprocessing_DataAugmentation_Biclass_Folder(Dataframe: pd.DataFrame) ->:
     #print(Dir_total[1])
     #print(len(Dir_total))
     #print(Total_dir)
-    #print(Total_files)
+    #print(Total_files)2
 
     for Index, dir in enumerate(Dir_total_training):
         print(Index)
